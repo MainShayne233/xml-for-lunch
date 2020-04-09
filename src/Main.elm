@@ -1,9 +1,11 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, div, h1, img, text, textarea)
+import Html exposing (Html, div, h1, img, p, text, textarea)
 import Html.Attributes exposing (cols, rows, src, value)
 import Html.Events exposing (onInput)
+import Xml
+import XmlParse
 
 
 
@@ -52,7 +54,12 @@ view model =
 
 viewParseResult : Model -> Html Msg
 viewParseResult model =
-    div [] []
+    case XmlParse.parse model.input of
+        Err errorMessage ->
+            p [] [ text ("Error: " ++ errorMessage) ]
+
+        Ok element ->
+            p [] [ text (Xml.stringFromElement element) ]
 
 
 
