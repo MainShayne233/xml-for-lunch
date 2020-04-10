@@ -50,6 +50,22 @@ all =
                     in
                     Expect.equal (Err "helloasdf") result
             ]
+        , describe "identifier"
+            [ test "should successfully parse a valid identifier" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.identifier "i-am-an-identifier asdf"
+                    in
+                    Expect.equal (Ok ( " asdf", "i-am-an-identifier" )) result
+            , test "should fail to parse an invalid identifier" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.identifier "-not-an-identifier"
+                    in
+                    Expect.equal (Err "-not-an-identifier") result
+            ]
 
         -- test "ParserCombinator.matchLiteral: success" <|
         --     \_ ->
