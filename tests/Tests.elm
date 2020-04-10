@@ -1,8 +1,8 @@
 module Tests exposing (..)
 
 import Expect
+import ParserCombinator
 import Test exposing (..)
-import XmlParse
 
 
 
@@ -11,22 +11,53 @@ import XmlParse
 
 all : Test
 all =
-    describe "A Test Suite"
-        [ test "XmlParse.matchLiteral: success" <|
-            \_ ->
-                let
-                    parser =
-                        XmlParse.matchLiteral "asdf"
-                in
-                Expect.equal (Ok "hello") (parser "asdfhello")
-        , test "XmlParse.matchLiteral: failure" <|
-            \_ ->
-                let
-                    parser =
-                        XmlParse.matchLiteral "asdf"
-                in
-                Expect.equal (Err "helloasdf") (parser "helloasdf")
-        , test "String.left" <|
-            \_ ->
-                Expect.equal "a" (String.left 1 "abcdefg")
+    describe "ParserCombinator"
+        [ describe "theLetterA"
+            [ test "should match on the letter a" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.theLetterA "a"
+                    in
+                    Expect.equal (Ok ( "", "a" )) result
+            , test "should result in an error for any other char" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.theLetterA "b"
+                    in
+                    Expect.equal (Err "b") result
+            ]
+
+        -- test "ParserCombinator.matchLiteral: success" <|
+        --     \_ ->
+        --         let
+        --             parser =
+        --                 ParserCombinator.matchLiteral "asdf"
+        --         in
+        --         Expect.equal (Ok ( "asdf", "hello" )) (parser "asdfhello")
+        -- , test "ParserCombinator.matchLiteral: failure" <|
+        --     \_ ->
+        --         let
+        --             parser =
+        --                 ParserCombinator.matchLiteral "asdf"
+        --         in
+        --         Expect.equal (Err "helloasdf") (parser "helloasdf")
+        -- , test "ParserCombinator.splitWhile" <|
+        --     \_ ->
+        --         let
+        --             actual =
+        --                 ParserCombinator.splitWhile ParserCombinator.isAlphabetic [ 'a', 'b', 'c', '1' ]
+        --         in
+        --         Expect.equal ( [ 'a', 'b', 'c' ], [ '1' ] ) actual
+        -- , test "ParserCombinator.identifier" <|
+        --     \_ ->
+        --         let
+        --             actual =
+        --                 ParserCombinator.identifier "doIt 1234"
+        --         in
+        --         Expect.equal (Ok ( "doIt", " 1234" )) actual
+        -- , test "String.left" <|
+        --     \_ ->
+        --         Expect.equal "a" (String.left 1 "abcdefg")
         ]
