@@ -28,6 +28,28 @@ all =
                     in
                     Expect.equal (Err "b") result
             ]
+        , describe "matchLiteral"
+            [ test "should produce a parser that will match on the given literal" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.matchLiteral "asdf"
+
+                        result =
+                            parser "asdfhello"
+                    in
+                    Expect.equal (Ok ( "hello", "asdf" )) result
+            , test "should produce a parser that will not match on a value that is not the given literal" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.matchLiteral "asdf"
+
+                        result =
+                            parser "helloasdf"
+                    in
+                    Expect.equal (Err "helloasdf") result
+            ]
 
         -- test "ParserCombinator.matchLiteral: success" <|
         --     \_ ->

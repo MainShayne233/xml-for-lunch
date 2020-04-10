@@ -12,3 +12,13 @@ theLetterA input =
 
     else
         Err input
+
+
+matchLiteral : String -> Parser
+matchLiteral literal =
+    \input ->
+        if String.startsWith literal input then
+            Ok ( String.dropLeft (String.length literal) input, literal )
+
+        else
+            Err input
