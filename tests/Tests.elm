@@ -398,4 +398,26 @@ all =
                     in
                     Expect.equal (Err "hey") result
             ]
+        , describe "element"
+            [ test "success: should parse a single element" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.element "<elem key=\"value\" other=\"another\"/>"
+
+                        expected =
+                            Xml.newElement "elem" [ ( "key", "value" ), ( "other", "another" ) ] []
+                    in
+                    Expect.equal (Ok ( "", expected )) result
+            , test "success: should parse an open element" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.element "<elem key=\"value\" other=\"another\">"
+
+                        expected =
+                            Xml.newElement "elem" [ ( "key", "value" ), ( "other", "another" ) ] []
+                    in
+                    Expect.equal (Ok ( "", expected )) result
+            ]
         ]

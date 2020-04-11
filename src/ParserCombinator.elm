@@ -139,6 +139,11 @@ openElement =
             )
 
 
+element : Parser Xml.Element
+element =
+    either singleElement openElement
+
+
 attributePair : Parser ( String, String )
 attributePair =
     pair identifier (right (matchLiteral "=") quotedString)
