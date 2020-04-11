@@ -144,4 +144,36 @@ all =
                     in
                     Expect.equal (Err "_asdf") result
             ]
+        , describe "right"
+            [ test "should produce a parser that's success result will be the rhs parser's value" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.right (ParserCombinator.matchLiteral "<") ParserCombinator.identifier
+
+                        result =
+                            parser "<my-first-element/>"
+                    in
+                    Expect.equal (Ok ( "/>", "my-first-element" )) result
+            , test "produced parser should err if the first parser fails" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.right (ParserCombinator.matchLiteral "<") ParserCombinator.identifier
+
+                        result =
+                            parser "oops"
+                    in
+                    Expect.equal (Err "oops") result
+            , test "produced parser should err if the second parser fails" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.right (ParserCombinator.matchLiteral "<") ParserCombinator.identifier
+
+                        result =
+                            parser "<!oops"
+                    in
+                    Expect.equal (Err "!oops") result
+            ]
         ]
