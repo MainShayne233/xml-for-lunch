@@ -139,6 +139,12 @@ openElement =
             )
 
 
+closeElement : String -> Parser String
+closeElement expectedName =
+    right (matchLiteral "</") (left identifier (matchLiteral ">"))
+        |> pred (\actualName -> actualName == expectedName)
+
+
 element : Parser Xml.Element
 element =
     either singleElement openElement

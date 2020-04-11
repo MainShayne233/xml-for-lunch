@@ -420,4 +420,16 @@ all =
                     in
                     Expect.equal (Ok ( "", expected )) result
             ]
+        , describe "closeElement"
+            [ test "success: should parse a close element" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.closeElement "cool"
+
+                        result =
+                            parser "</cool>"
+                    in
+                    Expect.equal (Ok ( "", "cool" )) result
+            ]
         ]
