@@ -119,6 +119,15 @@ singleElement =
             )
 
 
+openElement : Parser Xml.Element
+openElement =
+    left elementStart (matchLiteral ">")
+        |> map
+            (\( name, attrs ) ->
+                Xml.newElement name attrs []
+            )
+
+
 attributePair : Parser ( String, String )
 attributePair =
     pair identifier (right (matchLiteral "=") quotedString)
