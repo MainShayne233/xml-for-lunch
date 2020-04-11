@@ -43,6 +43,27 @@ linesFromElement padding element =
             )
 
 
+elementName : Element -> String
+elementName element =
+    let
+        elemData =
+            data element
+    in
+    elemData.name
+
+
+setChildren : List Element -> Element -> Element
+setChildren children element =
+    let
+        elemData =
+            data element
+
+        updatedData =
+            { elemData | children = children }
+    in
+    Element updatedData
+
+
 stringFromElement : Element -> String
 stringFromElement element =
     element
@@ -63,8 +84,8 @@ stringFromAttribute ( key, value ) =
 
 
 newElement : String -> List Attribute -> List Element -> Element
-newElement name attributes children =
-    Element (ElementData name attributes children)
+newElement elemName attributes children =
+    Element (ElementData elemName attributes children)
 
 
 data : Element -> ElementData

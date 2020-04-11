@@ -329,6 +329,16 @@ all =
                 \_ ->
                     let
                         result =
+                            ParserCombinator.singleElement "<elem/>"
+
+                        expected =
+                            Xml.newElement "elem" [] []
+                    in
+                    Expect.equal (Ok ( "", expected )) result
+            , test "success: should parse a valid single element with attrs" <|
+                \_ ->
+                    let
+                        result =
                             ParserCombinator.singleElement "<elem key=\"value\" other=\"another\"/>"
 
                         expected =
@@ -409,11 +419,25 @@ all =
                             Xml.newElement "elem" [ ( "key", "value" ), ( "other", "another" ) ] []
                     in
                     Expect.equal (Ok ( "", expected )) result
-            , test "success: should parse an open element" <|
+            , test "success: should tolerate white space" <|
                 \_ ->
                     let
                         result =
-                            ParserCombinator.element "<elem key=\"value\" other=\"another\">"
+                            ParserCombinator.element """
+                                                      <cool key="value">
+                                                        <hi name="sean"/>
+                                                      </cool>
+                                                      """
+
+                        expected =
+                            Xml.newElement "cool" [ ( "key", "value" ) ] [ Xml.newElement "hi" [ ( "name", "sean" ) ] [] ]
+                    in
+                    Expect.equal (Ok ( "", expected )) result
+            , test "success: should parse a parent element" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.element "<elem key=\"value\" other=\"another\"></elem>"
 
                         expected =
                             Xml.newElement "elem" [ ( "key", "value" ), ( "other", "another" ) ] []
@@ -421,7 +445,7 @@ all =
                     Expect.equal (Ok ( "", expected )) result
             ]
         , describe "closeElement"
-            [ test "success: should parse a close element" <|
+            [ test "success: should parse a closed element" <|
                 \_ ->
                     let
                         parser =
@@ -431,5 +455,17 @@ all =
                             parser "</cool>"
                     in
                     Expect.equal (Ok ( "", "cool" )) result
+            ]
+        , describe "parentElement"
+            [ test "success: should parse an element with children" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.parentElement "<cool><hi/></cool>"
+
+                        expected =
+                            Xml.newElement "cool" [] [ Xml.newElement "hi" [] [] ]
+                    in
+                    Expect.equal (Ok ( "", expected )) result
             ]
         ]

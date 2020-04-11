@@ -145,9 +145,41 @@ closeElement expectedName =
         |> pred (\actualName -> actualName == expectedName)
 
 
+parentElement : Parser Xml.Element
+parentElement =
+    openElement
+        |> andThen
+            (\elem ->
+                left (zeroOrMore element) (closeElement (Xml.elementName elem))
+                    |> map
+                        (\children ->
+                            Xml.setChildren children elem
+                        )
+            )
+
+
+andThen : (a -> Parser b) -> Parser a -> Parser b
+andThen func parser =
+    \input ->
+        case parser input of
+            Ok ( nextInput, match ) ->
+                func match nextInput
+
+            Err err ->
+                Err err
+
+
+whitespaceWrap : Parser a -> Parser a
+whitespaceWrap parser =
+    someOrNoWhitespace
+        |> left parser
+        |> right someOrNoWhitespace
+
+
 element : Parser Xml.Element
 element =
-    either singleElement openElement
+    either singleElement parentElement
+        |> whitespaceWrap
 
 
 attributePair : Parser ( String, String )
@@ -258,7 +290,7 @@ splitWhile check chars =
 
 isWhitespace : Char -> Bool
 isWhitespace char =
-    List.member char [ ' ' ]
+    List.member char [ ' ', '\n', '\t' ]
 
 
 isNotChar : Char -> Char -> Bool
