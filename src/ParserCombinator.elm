@@ -55,28 +55,25 @@ identifier input =
 pair : Parser a -> Parser b -> Parser ( a, b )
 pair firstParser secondParser =
     \input ->
-        case firstParser input of
-            Ok ( nextInput, firstParsed ) ->
-                case secondParser nextInput of
-                    Ok ( finalInput, secondParsed ) ->
-                        Ok ( finalInput, ( firstParsed, secondParsed ) )
-
-                    Err error ->
-                        Err error
-
-            Err error ->
-                Err error
+        input
+            |> firstParser
+            |> Result.andThen
+                (\( nextInput, firstParsed ) ->
+                    nextInput
+                        |> secondParser
+                        |> Result.andThen
+                            (\( finalInput, secondParsed ) ->
+                                Ok ( finalInput, ( firstParsed, secondParsed ) )
+                            )
+                )
 
 
 map : Parser a -> (a -> b) -> Parser b
 map parser mapper =
     \input ->
-        case parser input of
-            Ok ( rest, parsed ) ->
-                Ok ( rest, mapper parsed )
-
-            Err error ->
-                Err error
+        input
+            |> parser
+            |> Result.andThen (\( rest, parsed ) -> Ok ( rest, mapper parsed ))
 
 
 isAlphanumeric : Char -> Bool
