@@ -95,6 +95,16 @@ doZeroOrMore parser input matches =
             doZeroOrMore parser nextInput (matches ++ [ match ])
 
 
+anyChar : Parser Char
+anyChar input =
+    case String.toList input of
+        head :: tail ->
+            Ok ( String.fromList tail, head )
+
+        [] ->
+            Err input
+
+
 left : Parser a -> Parser b -> Parser a
 left lhsParser rhsParser =
     rhsParser

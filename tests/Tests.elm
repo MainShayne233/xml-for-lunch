@@ -240,4 +240,20 @@ all =
                     in
                     Expect.equal (Ok ( "!asdf", [] )) result
             ]
+        , describe "anyChar"
+            [ test "success: parses a char" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.anyChar "asdf"
+                    in
+                    Expect.equal (Ok ( "sdf", 'a' )) result
+            , test "failure: no char in empty string" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.anyChar ""
+                    in
+                    Expect.equal (Err "") result
+            ]
         ]
