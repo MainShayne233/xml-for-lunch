@@ -48,9 +48,42 @@ identifier input =
                 Err input
 
 
+pair : Parser -> Parser -> (String -> Result String ( String, ( String, String ) ))
+pair firstParser secondParser =
+    \input ->
+        case firstParser input of
+            Ok ( nextInput, firstParsed ) ->
+                case secondParser nextInput of
+                    Ok ( finalInput, secondParsed ) ->
+                        Ok ( finalInput, ( firstParsed, secondParsed ) )
+
+                    Err error ->
+                        Err error
+
+            Err error ->
+                Err error
+
+
+map : Parser -> (String -> a) -> (String -> Result String ( String, a ))
+map parser mapper =
+    \input ->
+        case parser input of
+            Ok ( rest, parsed ) ->
+                Ok ( rest, mapper parsed )
+
+            Err error ->
+                Err error
+
+
 isAlphanumeric : Char -> Bool
 isAlphanumeric char =
-    List.member (Char.toCode char) (List.range 65 122 ++ List.range 48 57)
+    List.member (Char.toCode char)
+        (List.concat
+            [ List.range (Char.toCode 'A') (Char.toCode 'Z')
+            , List.range (Char.toCode 'a') (Char.toCode 'z')
+            , List.range (Char.toCode '0') (Char.toCode '9')
+            ]
+        )
 
 
 splitAt : Int -> List a -> ( List a, List a )

@@ -66,36 +66,82 @@ all =
                     in
                     Expect.equal (Err "-not-an-identifier") result
             ]
+        , describe "pair"
+            [ test "should produce a parser that is a combination of two other parsers" <|
+                \_ ->
+                    let
+                        firstParser =
+                            ParserCombinator.identifier
 
-        -- test "ParserCombinator.matchLiteral: success" <|
-        --     \_ ->
-        --         let
-        --             parser =
-        --                 ParserCombinator.matchLiteral "asdf"
-        --         in
-        --         Expect.equal (Ok ( "asdf", "hello" )) (parser "asdfhello")
-        -- , test "ParserCombinator.matchLiteral: failure" <|
-        --     \_ ->
-        --         let
-        --             parser =
-        --                 ParserCombinator.matchLiteral "asdf"
-        --         in
-        --         Expect.equal (Err "helloasdf") (parser "helloasdf")
-        -- , test "ParserCombinator.splitWhile" <|
-        --     \_ ->
-        --         let
-        --             actual =
-        --                 ParserCombinator.splitWhile ParserCombinator.isAlphabetic [ 'a', 'b', 'c', '1' ]
-        --         in
-        --         Expect.equal ( [ 'a', 'b', 'c' ], [ '1' ] ) actual
-        -- , test "ParserCombinator.identifier" <|
-        --     \_ ->
-        --         let
-        --             actual =
-        --                 ParserCombinator.identifier "doIt 1234"
-        --         in
-        --         Expect.equal (Ok ( "doIt", " 1234" )) actual
-        -- , test "String.left" <|
-        --     \_ ->
-        --         Expect.equal "a" (String.left 1 "abcdefg")
+                        secondParser =
+                            ParserCombinator.matchLiteral "!"
+
+                        pairParser =
+                            ParserCombinator.pair firstParser secondParser
+
+                        result =
+                            pairParser "woah!"
+                    in
+                    Expect.equal (Ok ( "", ( "woah", "!" ) )) result
+            , test "should produce a parser that will fail if the first parser fails" <|
+                \_ ->
+                    let
+                        firstParser =
+                            ParserCombinator.identifier
+
+                        secondParser =
+                            ParserCombinator.matchLiteral "!"
+
+                        pairParser =
+                            ParserCombinator.pair firstParser secondParser
+
+                        result =
+                            pairParser "_woah!"
+                    in
+                    Expect.equal (Err "_woah!") result
+            , test "should produce a parser that will fail if the second parser fails" <|
+                \_ ->
+                    let
+                        firstParser =
+                            ParserCombinator.identifier
+
+                        secondParser =
+                            ParserCombinator.matchLiteral "!"
+
+                        pairParser =
+                            ParserCombinator.pair firstParser secondParser
+
+                        result =
+                            pairParser "woah?"
+                    in
+                    Expect.equal (Err "?") result
+            ]
+        , describe "map"
+            [ test "should produce a function that will map the successful result of a parser" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.identifier
+
+                        mappedParser =
+                            ParserCombinator.map parser (\_ -> 100)
+
+                        result =
+                            mappedParser "asdf"
+                    in
+                    Expect.equal (Ok ( "", 100 )) result
+            , test "should produce a function that drop the error result through for a failed parse" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.identifier
+
+                        mappedParser =
+                            ParserCombinator.map parser (\_ -> 100)
+
+                        result =
+                            mappedParser "_asdf"
+                    in
+                    Expect.equal (Err "_asdf") result
+            ]
         ]
