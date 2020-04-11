@@ -151,6 +151,7 @@ parentElement =
         |> andThen
             (\elem ->
                 left (zeroOrMore element) (closeElement (Xml.elementName elem))
+                    |> whitespaceWrap
                     |> map
                         (\children ->
                             Xml.setChildren children elem
