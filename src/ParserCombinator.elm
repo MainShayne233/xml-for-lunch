@@ -1,5 +1,7 @@
 module ParserCombinator exposing (..)
 
+import Xml
+
 
 type alias ParseResult t =
     Result String ( String, t )
@@ -101,6 +103,30 @@ quotedString =
         |> left (zeroOrMore (pred (isNotChar '"') anyChar))
         |> right (matchLiteral "\"")
         |> map String.fromList
+
+
+elementStart : Parser ( String, List ( String, String ) )
+elementStart =
+    right (matchLiteral "<") (pair identifier attributes)
+
+
+singleElement : Parser Xml.Element
+singleElement =
+    left elementStart (matchLiteral "/>")
+        |> map
+            (\( name, attrs ) ->
+                Xml.newElement name attrs []
+            )
+
+
+attributePair : Parser ( String, String )
+attributePair =
+    pair identifier (right (matchLiteral "=") quotedString)
+
+
+attributes : Parser (List ( String, String ))
+attributes =
+    zeroOrMore (right someWhitespace attributePair)
 
 
 anyChar : Parser Char

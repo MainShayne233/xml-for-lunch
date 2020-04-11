@@ -3,6 +3,7 @@ module Tests exposing (..)
 import Expect
 import ParserCombinator
 import Test exposing (..)
+import Xml
 
 
 
@@ -286,5 +287,53 @@ all =
                             ParserCombinator.quotedString "\"hello, world!\""
                     in
                     Expect.equal (Ok ( "", "hello, world!" )) result
+            ]
+        , describe "attributePair"
+            [ test "success: should parse a valid attribute pair" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.attributePair "key=\"value\""
+                    in
+                    Expect.equal (Ok ( "", ( "key", "value" ) )) result
+            ]
+        , describe "someWhitespace"
+            [ test "success: should parse a single space" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.someWhitespace " "
+                    in
+                    Expect.equal (Ok ( "", [ ' ' ] )) result
+            ]
+        , describe "attributes"
+            [ test "success: should parse all valid attribute pairs" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.attributes " key=\"value\" otherkey=\"other value\""
+                    in
+                    Expect.equal (Ok ( "", [ ( "key", "value" ), ( "otherkey", "other value" ) ] )) result
+            ]
+        , describe "elementStart"
+            [ test "success: should parse the start of an element" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.elementStart "<elem key=\"value\" other=\"another\""
+                    in
+                    Expect.equal (Ok ( "", ( "elem", [ ( "key", "value" ), ( "other", "another" ) ] ) )) result
+            ]
+        , describe "singleElement"
+            [ test "success: should parse a valid element" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.singleElement "<elem key=\"value\" other=\"another\"/>"
+
+                        expected =
+                            Xml.newElement "elem" [ ( "key", "value" ), ( "other", "another" ) ] []
+                    in
+                    Expect.equal (Ok ( "", expected )) result
             ]
         ]
