@@ -348,4 +348,54 @@ all =
                     in
                     Expect.equal (Ok ( "", expected )) result
             ]
+        , describe "either"
+            [ test "success: will return the result if the first parser if successful" <|
+                \_ ->
+                    let
+                        lhsParser =
+                            ParserCombinator.matchLiteral "asdf"
+
+                        rhsParser =
+                            ParserCombinator.matchLiteral "hello"
+
+                        eitherParser =
+                            ParserCombinator.either lhsParser rhsParser
+
+                        result =
+                            eitherParser "asdf"
+                    in
+                    Expect.equal (Ok ( "", "asdf" )) result
+            , test "success: will return the result if the second parser if successful" <|
+                \_ ->
+                    let
+                        lhsParser =
+                            ParserCombinator.matchLiteral "asdf"
+
+                        rhsParser =
+                            ParserCombinator.matchLiteral "hello"
+
+                        eitherParser =
+                            ParserCombinator.either lhsParser rhsParser
+
+                        result =
+                            eitherParser "hello"
+                    in
+                    Expect.equal (Ok ( "", "hello" )) result
+            , test "failure: will return an err if both parsers fail" <|
+                \_ ->
+                    let
+                        lhsParser =
+                            ParserCombinator.matchLiteral "asdf"
+
+                        rhsParser =
+                            ParserCombinator.matchLiteral "hello"
+
+                        eitherParser =
+                            ParserCombinator.either lhsParser rhsParser
+
+                        result =
+                            eitherParser "hey"
+                    in
+                    Expect.equal (Err "hey") result
+            ]
         ]

@@ -70,6 +70,17 @@ pair firstParser secondParser =
                 )
 
 
+either : Parser a -> Parser a -> Parser a
+either lhsParser rhsParser =
+    \input ->
+        case lhsParser input of
+            Err _ ->
+                rhsParser input
+
+            success ->
+                success
+
+
 oneOrMore : Parser a -> Parser (List a)
 oneOrMore parser =
     \input ->
