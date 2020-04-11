@@ -71,20 +71,28 @@ pair firstParser secondParser =
 oneOrMore : Parser a -> Parser (List a)
 oneOrMore parser =
     \input ->
-        doOneOrMore parser input []
+        case zeroOrMore parser input of
+            Ok ( _, [] ) ->
+                Err input
+
+            other ->
+                other
 
 
-doOneOrMore : Parser a -> String -> List a -> ParseResult (List a)
-doOneOrMore parser input matches =
-    case ( parser input, matches ) of
-        ( Err error, [] ) ->
-            Err error
+zeroOrMore : Parser a -> Parser (List a)
+zeroOrMore parser =
+    \input ->
+        doZeroOrMore parser input []
 
-        ( Err error, _ ) ->
+
+doZeroOrMore : Parser a -> String -> List a -> ParseResult (List a)
+doZeroOrMore parser input matches =
+    case parser input of
+        Err error ->
             Ok ( input, matches )
 
-        ( Ok ( nextInput, match ), _ ) ->
-            doOneOrMore parser nextInput (matches ++ [ match ])
+        Ok ( nextInput, match ) ->
+            doZeroOrMore parser nextInput (matches ++ [ match ])
 
 
 left : Parser a -> Parser b -> Parser a

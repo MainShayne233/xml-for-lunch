@@ -208,4 +208,36 @@ all =
                     in
                     Expect.equal (Err "!asdf") result
             ]
+        , describe "zeroOrMore"
+            [ test "success: parser one match" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.zeroOrMore (ParserCombinator.matchLiteral "asdf")
+
+                        result =
+                            parser "asdf"
+                    in
+                    Expect.equal (Ok ( "", [ "asdf" ] )) result
+            , test "success: parser more than one match" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.zeroOrMore (ParserCombinator.matchLiteral "asdf")
+
+                        result =
+                            parser "asdfasdfasdf"
+                    in
+                    Expect.equal (Ok ( "", [ "asdf", "asdf", "asdf" ] )) result
+            , test "success: should return an empty list for no matches" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.zeroOrMore (ParserCombinator.matchLiteral "asdf")
+
+                        result =
+                            parser "!asdf"
+                    in
+                    Expect.equal (Ok ( "!asdf", [] )) result
+            ]
         ]
