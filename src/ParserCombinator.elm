@@ -68,8 +68,22 @@ pair firstParser secondParser =
                 )
 
 
-map : Parser a -> (a -> b) -> Parser b
-map parser mapper =
+left : Parser a -> Parser b -> Parser a
+left lhsParser rhsParser =
+    rhsParser
+        |> pair lhsParser
+        |> map Tuple.first
+
+
+right : Parser a -> Parser b -> Parser b
+right lhsParser rhsParser =
+    rhsParser
+        |> pair lhsParser
+        |> map Tuple.second
+
+
+map : (a -> b) -> Parser a -> Parser b
+map mapper parser =
     \input ->
         input
             |> parser

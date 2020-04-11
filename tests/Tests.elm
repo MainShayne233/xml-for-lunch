@@ -124,7 +124,7 @@ all =
                             ParserCombinator.identifier
 
                         mappedParser =
-                            ParserCombinator.map parser (\_ -> 100)
+                            ParserCombinator.map (\_ -> 100) parser
 
                         result =
                             mappedParser "asdf"
@@ -137,7 +137,7 @@ all =
                             ParserCombinator.identifier
 
                         mappedParser =
-                            ParserCombinator.map parser (\_ -> 100)
+                            ParserCombinator.map (\_ -> 100) parser
 
                         result =
                             mappedParser "_asdf"
