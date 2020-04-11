@@ -1,11 +1,15 @@
 module ParserCombinator exposing (..)
 
 
-type alias Parser =
-    String -> Result String ( String, String )
+type alias ParseResult t =
+    Result String ( String, t )
 
 
-theLetterA : Parser
+type alias Parser t =
+    String -> ParseResult t
+
+
+theLetterA : Parser String
 theLetterA input =
     if String.startsWith "a" input then
         Ok ( String.dropLeft 1 input, "a" )
@@ -14,7 +18,7 @@ theLetterA input =
         Err input
 
 
-matchLiteral : String -> Parser
+matchLiteral : String -> Parser String
 matchLiteral literal =
     \input ->
         if String.startsWith literal input then
@@ -24,7 +28,7 @@ matchLiteral literal =
             Err input
 
 
-identifier : Parser
+identifier : Parser String
 identifier input =
     case String.toList input of
         [] ->
@@ -48,7 +52,7 @@ identifier input =
                 Err input
 
 
-pair : Parser -> Parser -> (String -> Result String ( String, ( String, String ) ))
+pair : Parser a -> Parser b -> Parser ( a, b )
 pair firstParser secondParser =
     \input ->
         case firstParser input of
@@ -64,7 +68,7 @@ pair firstParser secondParser =
                 Err error
 
 
-map : Parser -> (String -> a) -> (String -> Result String ( String, a ))
+map : Parser a -> (a -> b) -> Parser b
 map parser mapper =
     \input ->
         case parser input of
