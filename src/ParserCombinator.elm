@@ -68,6 +68,25 @@ pair firstParser secondParser =
                 )
 
 
+oneOrMore : Parser a -> Parser (List a)
+oneOrMore parser =
+    \input ->
+        doOneOrMore parser input []
+
+
+doOneOrMore : Parser a -> String -> List a -> ParseResult (List a)
+doOneOrMore parser input matches =
+    case ( parser input, matches ) of
+        ( Err error, [] ) ->
+            Err error
+
+        ( Err error, _ ) ->
+            Ok ( input, matches )
+
+        ( Ok ( nextInput, match ), _ ) ->
+            doOneOrMore parser nextInput (matches ++ [ match ])
+
+
 left : Parser a -> Parser b -> Parser a
 left lhsParser rhsParser =
     rhsParser

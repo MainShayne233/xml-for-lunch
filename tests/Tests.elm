@@ -176,4 +176,36 @@ all =
                     in
                     Expect.equal (Err "!oops") result
             ]
+        , describe "oneOrMore"
+            [ test "success: parser one match" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.oneOrMore (ParserCombinator.matchLiteral "asdf")
+
+                        result =
+                            parser "asdf"
+                    in
+                    Expect.equal (Ok ( "", [ "asdf" ] )) result
+            , test "success: parser more than one match" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.oneOrMore (ParserCombinator.matchLiteral "asdf")
+
+                        result =
+                            parser "asdfasdfasdf"
+                    in
+                    Expect.equal (Ok ( "", [ "asdf", "asdf", "asdf" ] )) result
+            , test "failure: returns err if not a single match was made" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.oneOrMore (ParserCombinator.matchLiteral "asdf")
+
+                        result =
+                            parser "!asdf"
+                    in
+                    Expect.equal (Err "!asdf") result
+            ]
         ]
