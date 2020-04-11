@@ -256,4 +256,35 @@ all =
                     in
                     Expect.equal (Err "") result
             ]
+        , describe "pred"
+            [ test "success: produces a parser that requires a predicate function to pass" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.pred (\ident -> String.length ident > 1) ParserCombinator.identifier
+
+                        result =
+                            parser "asdf"
+                    in
+                    Expect.equal (Ok ( "", "asdf" )) result
+            , test "failure: returns err if predicate returns false" <|
+                \_ ->
+                    let
+                        parser =
+                            ParserCombinator.pred (\ident -> String.length ident > 1) ParserCombinator.identifier
+
+                        result =
+                            parser "a"
+                    in
+                    Expect.equal (Err "a") result
+            ]
+        , describe "quotedString"
+            [ test "success: parses a quoted string" <|
+                \_ ->
+                    let
+                        result =
+                            ParserCombinator.quotedString "\"hello, world!\""
+                    in
+                    Expect.equal (Ok ( "", "hello, world!" )) result
+            ]
         ]

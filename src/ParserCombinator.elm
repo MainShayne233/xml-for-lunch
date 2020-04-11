@@ -95,6 +95,14 @@ doZeroOrMore parser input matches =
             doZeroOrMore parser nextInput (matches ++ [ match ])
 
 
+quotedString : Parser String
+quotedString =
+    matchLiteral "\""
+        |> left (zeroOrMore (pred (isNotChar '"') anyChar))
+        |> right (matchLiteral "\"")
+        |> map String.fromList
+
+
 anyChar : Parser Char
 anyChar input =
     case String.toList input of
@@ -103,6 +111,36 @@ anyChar input =
 
         [] ->
             Err input
+
+
+someWhitespace : Parser (List Char)
+someWhitespace =
+    oneOrMore whitespaceChar
+
+
+someOrNoWhitespace : Parser (List Char)
+someOrNoWhitespace =
+    zeroOrMore whitespaceChar
+
+
+whitespaceChar : Parser Char
+whitespaceChar =
+    pred isWhitespace anyChar
+
+
+pred : (a -> Bool) -> Parser a -> Parser a
+pred predicate parser =
+    \input ->
+        input
+            |> parser
+            |> Result.andThen
+                (\( restInput, match ) ->
+                    if predicate match then
+                        Ok ( restInput, match )
+
+                    else
+                        Err input
+                )
 
 
 left : Parser a -> Parser b -> Parser a
@@ -159,3 +197,13 @@ splitWhile check chars =
 
             else
                 ( [], head :: tail )
+
+
+isWhitespace : Char -> Bool
+isWhitespace char =
+    List.member char [ ' ' ]
+
+
+isNotChar : Char -> Char -> Bool
+isNotChar lhsChar rhsChar =
+    lhsChar /= rhsChar
